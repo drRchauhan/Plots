@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Oral Microbiome Plots | NHANES 2009-2012</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f7f8fa;
+            --card: #ffffff;
+            --accent-blue: #0a3250;
+            --accent-blue-light: #2878a0;
+            --accent-red: #781414;
+            --accent-red-light: #b83030;
+            --text: #1a1a2e;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .hero {
+            background: linear-gradient(135deg, #0a3250 0%, #1a5f8a 50%, #2878a0 100%);
+            color: white;
+            padding: 3rem 1.5rem 2.5rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        .hero .subtitle {
+            font-size: 0.95rem;
+            opacity: 0.85;
+            max-width: 620px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.5;
+        }
+        .badge-row {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 0.3rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 3rem;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .info-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+        .info-item .label {
+            font-size: 0.72rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.25rem;
+        }
+        .info-item .value {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+        .plot-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.25rem;
+            transition: box-shadow 0.2s ease, transform 0.15s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+        }
+        .plot-card:hover {
+            box-shadow: 0 4px 24px rgba(10,50,80,0.08);
+            transform: translateY(-1px);
+        }
+        .plot-icon {
+            flex-shrink: 0;
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .plot-icon.blue { background: #e8f4fb; }
+        .plot-icon.red { background: #fbeaea; }
+        .plot-icon svg { width: 28px; height: 28px; }
+        .plot-body { flex: 1; }
+        .plot-body h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 0.4rem;
+        }
+        .plot-body h2.blue-title { color: var(--accent-blue); }
+        .plot-body h2.red-title { color: var(--accent-red); }
+        .plot-body p {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.55;
+            margin-bottom: 1rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: white;
+            text-decoration: none;
+            padding: 0.6rem 1.3rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: opacity 0.2s ease;
+        }
+        .btn:hover { opacity: 0.85; }
+        .btn.blue { background: var(--accent-blue); }
+        .btn.red { background: var(--accent-red); }
+        .btn svg { width: 16px; height: 16px; }
+        footer {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            color: var(--muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+        }
+        footer a { color: var(--accent-blue-light); text-decoration: none; }
+        @media (max-width: 540px) {
+            .hero { padding: 2rem 1rem 1.5rem; }
+            .container { padding: 1.5rem 1rem; }
+            .plot-card { flex-direction: column; padding: 1.25rem; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Interactive 3D Oral Microbiome Plots</h1>
+        <p class="subtitle">
+            Exploring genus-level abundance patterns across six community types (CT1-CT6)
+            and systemic antibiotic exposure using NHANES 2009-2012 data.
+        </p>
+        <div class="badge-row">
+            <span class="badge">NHANES 2009-2012</span>
+            <span class="badge">N = 8,237</span>
+            <span class="badge">27 Genera</span>
+            <span class="badge">6 Community Types</span>
+        </div>
+    </div>
+    <div class="container">
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="label">Study Design</div>
+                <div class="value">Cross-sectional</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Clustering</div>
+                <div class="value">DMM (k=6)</div>
+            </div>
+            <div class="info-item">
+                <div class="label">CT2 Association</div>
+                <div class="value">aOR = 4.15</div>
+            </div>
+            <div class="info-item">
+                <div class="label">CT6 Association</div>
+                <div class="value">aOR = 4.19</div>
+            </div>
+        </div>
+        <div class="plot-card">
+            <div class="plot-icon red">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#781414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="12" width="4" height="9" rx="1"/>
+                    <rect x="10" y="5" width="4" height="16" rx="1"/>
+                    <rect x="17" y="8" width="4" height="13" rx="1"/>
+                </svg>
+            </div>
+            <div class="plot-body">
+                <h2 class="red-title">3D Bar Plots: 27 Genera</h2>
+                <p>
+                    Interactive 3D bar charts showing mean relative abundance for each of the
+                    top 27 genera, grouped by community type and antibiotic use status. Rotate
+                    and zoom to compare abundance distributions across CT1 through CT6.
+                </p>
+                <a href="genus_3D_bars_27.html" class="btn red">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Open 3D Bar Plots
+                </a>
+            </div>
+        </div>
+        <div class="plot-card">
+            <div class="plot-icon blue">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0a3250" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+            </div>
+            <div class="plot-body">
+                <h2 class="blue-title">3D Line Plots: 27 Genera</h2>
+                <p>
+                    Interactive 3D line visualizations with paired traces comparing antibiotic
+                    users vs. non-users for each genus. Hover for exact values and explore
+                    abundance trajectories across all six community types.
+                </p>
+                <a href="genus_3D_lines_CT_27.html" class="btn blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Open 3D Line Plots
+                </a>
+            </div>
+        </div>
+    </div>
+    <footer>
+        McGill University &middot; Faculty of Dental Medicine and Oral Health Sciences<br>
+        <a href="https://github.com/drRchauhan/Plots">View source on GitHub</a>
+    </footer>
+</body>
+</html>
